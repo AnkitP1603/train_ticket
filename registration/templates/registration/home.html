@@ -1,0 +1,33 @@
+{% extends "users/base.html" %}
+
+{% block content %}
+<h2>My Bookings</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Train Name</th>
+            <th>Start Station</th>
+            <th>Destination Station</th>
+            <th>PNR</th>
+            <th>Status</th>
+            <th>Date of Journey</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for booking in user_bookings %}
+        <tr>
+            <td>{{ booking.train_name }}</td>
+            <td>{{ booking.start_station }}</td>
+            <td>{{ booking.dest_station }}</td>
+            <td>{{ booking.pnr }}</td>
+            <td>{{ booking.booking_status }}</td>
+            <td>{{ booking.date_of_journey }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No bookings found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

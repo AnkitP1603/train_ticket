@@ -1,0 +1,26 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Select a Train</h2>
+    <form method="POST" action="{% url 'confirm_booking' %}">
+        {% csrf_token %}
+        <input type="hidden" name="start_station" value="{{ start_station }}">
+        <input type="hidden" name="dest_station" value="{{ dest_station }}">
+        <div class="form-group">
+            <label for="date_of_journey">Date of Journey:</label>
+            <input type="date" name="date_of_journey" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="train_id">Available Trains:</label>
+            <select name="train_id" class="form-control" required>
+                {% for train in trains %}
+                <option value="{{ train.id }}">{{ train.train_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Confirm Booking</button>
+    </form>
+</div>
+{% endblock %}

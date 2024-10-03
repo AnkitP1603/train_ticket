@@ -1,0 +1,42 @@
+  
+.custom-link {
+    color: #5f788a; /* Change the color code to your desired color */
+    text-decoration: none; /* Optional: to remove underline */
+}
+
+.custom-link:hover {
+    color: #0772eb; /* Optional: Change color on hover */
+    text-decoration: none;
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    text-align: center;
+    padding: 10px;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+td {
+    border: 1px solid #ddd;
+}
+
+td:empty {
+    background-color: #f9f9f9;
+}
+
+
+
+.highlight {
+    background-color: #fcf47a; /* Yellow background */
+    font-weight: bold; /* Make the text bold */
+    color: #000; /* Black text color */
+    border: 2px solid #000; /* Add a border to make it stand out */
+}

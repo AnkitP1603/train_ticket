@@ -1,0 +1,24 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+    
+    {% if form %}
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Check PNR</button>
+        </form>
+    {% endif %}
+    
+    {% if booking %}
+        <div class="booking-info">
+            <h3>Booking Details</h3>
+            <p><strong>PNR:</strong> {{ booking.pnr }}</p>
+            <p><strong>Train Name:</strong> {{ booking.train_name }}</p>
+            <p><strong>Start Station:</strong> {{ booking.start_station }}</p>
+            <p><strong>Destination Station:</strong> {{ booking.dest_station }}</p>
+            <p><strong>Date of Journey:</strong> {{ booking.date_of_journey }}</p>
+            <p><strong>User:</strong> {{ booking.user.username }}</p>
+        </div>
+    {% endif %}
+{% endblock %}

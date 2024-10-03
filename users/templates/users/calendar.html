@@ -1,0 +1,29 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+    <h2>{{ month_name }} {{ year }}</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+                <th>Sun</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for week in calendar %}
+            <tr>
+                {% for day_in_week in week %}
+                <td class="{% if day_in_week == day %}highlight{% endif %}">
+                    {{ day_in_week|default:"" }}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
