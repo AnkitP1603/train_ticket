@@ -101,7 +101,7 @@ def calendar_view(request):
     return render(request, 'users/calendar.html', context)
 
 
-from registration.models import Booking
+from registration.models import Booking,SeatBooking,Journey
 from .forms import CheckPnrForm
 def check_pnr(request):
     if request.method == 'POST':
@@ -110,7 +110,18 @@ def check_pnr(request):
             pnr = form.cleaned_data['pnr']
             try:
                 booking = Booking.objects.get(pnr=pnr)
-                return render(request, 'users/check_pnr.html', {'booking': booking})
+                seat_booking = SeatBooking.objects.select_related('journey').get(booking=booking)
+                journey = seat_booking.journey
+                seat = seat_booking.seat
+
+                context = {
+                    'booking': booking,
+                    'seat_booking': seat_booking,
+                    'journey': journey,
+                    'seat': seat,
+                }
+
+                return render(request, 'users/check_pnr.html',context)
             except Booking.DoesNotExist:
                 messages.error(request, 'No booking found with the provided PNR.')
     else:

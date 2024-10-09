@@ -14,14 +14,14 @@
         </tr>
     </thead>
     <tbody>
-        {% for booking in user_bookings %}
+        {% for bk in user_bookings %}
         <tr>
-            <td>{{ booking.train_name }}</td>
-            <td>{{ booking.start_station }}</td>
-            <td>{{ booking.dest_station }}</td>
-            <td>{{ booking.pnr }}</td>
-            <td>{{ booking.booking_status }}</td>
-            <td>{{ booking.date_of_journey }}</td>
+            <td>{{ bk.booking.journey.train.train_name }}</td>
+            <td>{{ bk.booking.start_station.station_name }}</td>
+            <td>{{ bk.booking.end_station.station_name }}</td>
+            <td>{{ bk.pnr }}</td>
+            <td>{{ bk.booking_status }}</td>
+            <td>{{ bk.date_of_journey }}</td>
         </tr>
         {% empty %}
         <tr>

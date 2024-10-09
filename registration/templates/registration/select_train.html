@@ -1,26 +1,51 @@
-{% extends 'users/base.html' %}
+{% extends "users/base.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2>Select a Train</h2>
-    <form method="POST" action="{% url 'confirm_booking' %}">
-        {% csrf_token %}
-        <input type="hidden" name="start_station" value="{{ start_station }}">
-        <input type="hidden" name="dest_station" value="{{ dest_station }}">
-        <div class="form-group">
-            <label for="date_of_journey">Date of Journey:</label>
-            <input type="date" name="date_of_journey" class="form-control" required>
-        </div>
+<h2>Select Train</h2>
 
-        <div class="form-group">
-            <label for="train_id">Available Trains:</label>
-            <select name="train_id" class="form-control" required>
-                {% for train in trains %}
-                <option value="{{ train.id }}">{{ train.train_name }}</option>
+<form method="post" action="{% url 'create_booking' %}">
+    {% csrf_token %}
+    
+    <!-- Hidden fields to pass data -->
+    <input type="hidden" name="start_station" value="{{ start_station }}">
+    <input type="hidden" name="dest_station" value="{{ dest_station }}">
+    <input type="hidden" name="date_of_journey" value="{{ date_of_journey }}">
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Select</th>
+                <th>Train Name</th>
+                <th>Departure Time</th>
+                <th>Arrival Time</th>
+                <th>Class</th>
+                <th>Available Seats</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for train in trains %}
+                {% for seat in train.seat_set.all %}
+                <tr>
+                    <td>
+                        <input type="radio" name="selected_seat" value="{{ seat.seat_id }}" required>
+                    </td>
+                    <td>{{ train.train.train_name }}</td>
+                    <td>{{ train.departure_time }}</td>
+                    <td>{{ train.arrival_time }}</td>
+                    <td>{{ seat.carriage.class_name }}</td>
+                    <td>{{ seat.available_seats }}</td>
+                    <td>{{ seat.price }}</td>
+                </tr>
                 {% endfor %}
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary">Confirm Booking</button>
-    </form>
-</div>
+            {% empty %}
+            <tr>
+                <td colspan="7">No trains available for the selected route.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Proceed to Booking</button>
+</form>
+
 {% endblock %}
