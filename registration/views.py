@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 import random,string
-from .models import Schedule, Booking
+from .models import Journey, Booking, SeatBooking, Seat, Passenger, Station
 from .forms import SearchTrainForm
 from datetime import datetime
 from django.contrib import messages
+from django.db import transaction
 
 def generate_pnr(length=10):
     characters = string.ascii_uppercase + string.digits
@@ -15,33 +16,9 @@ def generate_pnr(length=10):
 
 
 @login_required
-def create_booking(request):
-    if request.method == "POST":
-        # Assuming form data includes start_station, dest_station, etc.
-        start_station = request.POST.get('start_station')
-        dest_station = request.POST.get('dest_station')
-        date_of_journey = request.POST.get('date_of_journey')
-
-        train = get_object_or_404(Schedule, id=request.POST.get('train_id'))
-        
-        if request.user.is_authenticated:
-            pnr = generate_pnr()  # Assume this is your PNR generation method
-            booking = Booking.objects.create(
-                user=request.user,
-                train_name=train,
-                start_station=start_station,
-                dest_station=dest_station,  # Ensure this field is populated
-                date_of_journey=date_of_journey,
-                booking_status="Confirmed",
-                pnr=pnr
-            )
-            return redirect('home')
-
-
-@login_required
 def home(request):
     # Fetch bookings for the current user
-    user_bookings = Booking.objects.filter(user=request.user).select_related('train_name')
+    user_bookings = Booking.objects.filter(user=request.user)
     
     context = {
         'user_bookings': user_bookings
@@ -59,14 +36,18 @@ def search_train(request):
         if form.is_valid():
             start_station = form.cleaned_data['start_station']
             dest_station = form.cleaned_data['dest_station']
-
-            # Filter available trains based on start and end stations
-            available_trains = Schedule.objects.filter(start_station=start_station, dest_station=dest_station)
+            date_of_journey = form.cleaned_data['date_of_journey']
+            
+            available_trains = Journey.objects.filter(
+                src_station=start_station, 
+                dest_station=dest_station
+            ).prefetch_related('seat_set')
 
             return render(request, 'registration/select_train.html', {
                 'trains': available_trains,
                 'start_station': start_station,
                 'dest_station': dest_station,
+                'date_of_journey': date_of_journey
             })
     else:
         form = SearchTrainForm()
@@ -74,40 +55,61 @@ def search_train(request):
     return render(request, 'registration/search_train.html', {'form': form})
 
 
-
-def confirm_booking(request):
+@login_required
+def create_booking(request):
     if request.method == "POST":
-        train_id = request.POST.get('train_id')
+        selected_seat_id = request.POST.get('selected_seat')
         start_station = request.POST.get('start_station')
         dest_station = request.POST.get('dest_station')
         date_of_journey = request.POST.get('date_of_journey')
 
         try:
-            date_of_journey = datetime.strptime(date_of_journey, '%Y-%m-%d').date()
+            date_of_journey = datetime.strptime(date_of_journey, "%b. %d, %Y").date()
         except ValueError:
-            messages.error(request, "Invalid date format. Please use YYYY-MM-DD format.")
-            return redirect('select_train')
-        # Fetch the selected train
-        train = get_object_or_404(Schedule, id=train_id)
+            messages.error(request, "Invalid date format. Please use a valid format (e.g., Oct. 18, 2024).")
+            return redirect('search_train')
 
-        # Create a new booking
+        seat = get_object_or_404(Seat, seat_id=selected_seat_id)
+
         if request.user.is_authenticated:
+            if seat.available_seats <= 0:
+                messages.error(request, "No available seats!")
+                return redirect('search_train')
+            
+            passenger = get_object_or_404(Passenger,user=request.user)
             pnr = generate_pnr()
-            booking = Booking.objects.create(
-                user=request.user,
-                train_name=train,
-                start_station=start_station,
-                dest_station=dest_station,
-                date_of_journey=date_of_journey,
-                booking_status="Confirmed",
-                pnr=pnr
-            )
-            messages.success(request, "Booking confirmed!")
-            return redirect('home')
 
+            try:
+                seat_booking = SeatBooking.objects.create(
+                    passenger=passenger,  # Assuming a related passenger model
+                    seat=seat,
+                    journey=seat.journey, 
+                    start_station=get_object_or_404(Station,station_code = start_station),
+                    end_station=get_object_or_404(Station,station_code = dest_station)
+                )
+
+                booking = Booking.objects.create(
+                    booking=seat_booking,  
+                    user=request.user,
+                    booking_status="Confirmed",
+                    booking_date=datetime.now().date(), 
+                    total_amt=seat.price,
+                    date_of_journey=date_of_journey,
+                    pnr=pnr
+                )
+
+                seat.available_seats -= 1
+                seat.save()
+
+                messages.success(request, "Booking confirmed!")
+                return redirect('home')
+        
+            except Exception as e:
+                messages.error(request, "Booking could not be completed: {}".format(str(e)))
+                return redirect('search_train')
+
+    messages.error(request, "Booking could not be completed.")
     return redirect('search_train')
-
-
 
 
 @login_required
@@ -121,6 +123,11 @@ def cancel_ticket(request):
             booking = get_object_or_404(Booking, pnr=pnr)
 
             if confirm == 'yes':  # If the user confirmed, delete the booking
+                seat_booking = SeatBooking.objects.get(booking=booking)
+                seat = seat_booking.seat
+                seat.available_seats += 1
+                seat.save()
+                seat_booking.delete()
                 booking.delete()
                 messages.success(request, f"Booking with PNR {pnr} has been successfully canceled.")
                 return redirect('home')
