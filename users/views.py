@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required
 from .models import Profile
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Profile
 
 # Create your views here.
 
@@ -20,6 +19,7 @@ def register(request):
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
+
             messages.success(request,f'Your account has been created! You are now able to log in')
             return redirect('login')
     else:
@@ -101,7 +101,7 @@ def calendar_view(request):
     return render(request, 'users/calendar.html', context)
 
 
-from registration.models import Booking,SeatBooking,Journey
+from registration.models import Booking,SeatBooking
 from .forms import CheckPnrForm
 def check_pnr(request):
     if request.method == 'POST':
