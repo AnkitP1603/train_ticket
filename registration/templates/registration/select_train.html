@@ -6,7 +6,6 @@
 <form method="post" action="{% url 'create_booking' %}">
     {% csrf_token %}
     
-    <!-- Hidden fields to pass data -->
     <input type="hidden" name="start_station" value="{{ start_station }}">
     <input type="hidden" name="dest_station" value="{{ dest_station }}">
     <input type="hidden" name="date_of_journey" value="{{ date_of_journey }}">

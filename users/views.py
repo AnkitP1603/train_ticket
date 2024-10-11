@@ -1,10 +1,10 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
-from .forms import UserRegisterForm,UserUpdateForm,ProfileUpdateForm
+from .forms import UserRegisterForm,UserUpdateForm,ProfileUpdateForm,CheckPnrForm
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from .models import Profile
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
 
 # Create your views here.
@@ -44,7 +44,7 @@ def login(request):
             if not hasattr(user, 'profile'):
                 Profile.objects.create(user=user)
             
-            return redirect('home')  # or redirect to your desired page
+            return redirect('home')
     else:
         form = AuthenticationForm()
 
@@ -81,13 +81,11 @@ import calendar
 from datetime import datetime
 
 def calendar_view(request):
-    # Get the current month and year
     now = datetime.now()
     day = now.day
     month = now.month
     year = now.year
 
-    # Create a calendar for the current month
     cal = calendar.monthcalendar(year, month)
 
     context = {
@@ -102,7 +100,6 @@ def calendar_view(request):
 
 
 from registration.models import Booking,SeatBooking
-from .forms import CheckPnrForm
 def check_pnr(request):
     if request.method == 'POST':
         form = CheckPnrForm(request.POST)

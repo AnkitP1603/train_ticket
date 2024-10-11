@@ -80,11 +80,11 @@ WSGI_APPLICATION = 'train_ticket_booking.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'train_booking',   # The name of your MySQL database
-        'USER': 'root',      # Your MySQL username
-        'PASSWORD': 'mysql@ankit1603', # Your MySQL password
-        'HOST': 'localhost',            # Usually 'localhost'
-        'PORT': '3306',                 # MySQL port, usually 3306
+        'NAME': 'train_booking',  
+        'USER': 'root',    
+        'PASSWORD': 'mysql@ankit1603', 
+        'HOST': 'localhost',           
+        'PORT': '3306',        
     }
 }
 

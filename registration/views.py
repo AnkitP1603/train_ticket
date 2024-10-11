@@ -5,7 +5,6 @@ from .models import Journey, Booking, SeatBooking, Seat, Passenger, Station
 from .forms import SearchTrainForm
 from datetime import datetime
 from django.contrib import messages
-from django.db import transaction
 
 def generate_pnr(length=10):
     characters = string.ascii_uppercase + string.digits
@@ -17,7 +16,6 @@ def generate_pnr(length=10):
 
 @login_required
 def home(request):
-    # Fetch bookings for the current user
     user_bookings = Booking.objects.filter(user=request.user)
     
     context = {
@@ -81,7 +79,7 @@ def create_booking(request):
 
             try:
                 seat_booking = SeatBooking.objects.create(
-                    passenger=passenger,  # Assuming a related passenger model
+                    passenger=passenger,
                     seat=seat,
                     journey=seat.journey, 
                     start_station=get_object_or_404(Station,station_code = start_station),
@@ -119,10 +117,9 @@ def cancel_ticket(request):
         confirm = request.POST.get('confirm')
 
         try:
-            # Get the booking based on the PNR
             booking = get_object_or_404(Booking, pnr=pnr)
 
-            if confirm == 'yes':  # If the user confirmed, delete the booking
+            if confirm == 'yes':
                 seat_booking = SeatBooking.objects.get(booking=booking)
                 seat = seat_booking.seat
                 seat.available_seats += 1
@@ -132,7 +129,6 @@ def cancel_ticket(request):
                 messages.success(request, f"Booking with PNR {pnr} has been successfully canceled.")
                 return redirect('home')
 
-            # Render the confirmation page if not confirmed yet
             return render(request, 'registration/cancel_confirm.html', {'booking': booking})
 
         except Booking.DoesNotExist:
