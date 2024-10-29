@@ -1,0 +1,52 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2>Check Train Route</h2>
+
+        <form method="POST" class="form-group">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">View Route</button>
+        </form>
+
+        {% if messages %}
+            <div class="mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-danger">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if train %}
+            <h3>Route for Train: {{ train.train_name }} (ID: {{ train.train_id }})</h3>
+
+            {% if route_stops %}
+                <table class="table table-bordered mt-4">
+                    <thead>
+                        <tr>
+                            <th>Stop Order</th>
+                            <th>Station Name</th>
+                            <th>Arrival Time</th>
+                            <th>Departure Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stop in route_stops %}
+                            <tr>
+                                <td>{{ stop.stop_order }}</td>
+                                <td>{{ stop.station.station_name }}</td>
+                                <td>{{ stop.arrival_time }}</td>
+                                <td>{{ stop.departure_time }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No route information found for the selected train.</p>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endblock %}

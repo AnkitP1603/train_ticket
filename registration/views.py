@@ -70,7 +70,7 @@ def create_booking(request):
         seat = get_object_or_404(Seat, seat_id=selected_seat_id)
 
         if request.user.is_authenticated:
-            if seat.available_seats <= 0:
+            if seat.available_seats(date_of_journey) <= 0:
                 messages.error(request, "No available seats!")
                 return redirect('search_train')
             
@@ -83,7 +83,8 @@ def create_booking(request):
                     seat=seat,
                     journey=seat.journey, 
                     start_station=get_object_or_404(Station,station_code = start_station),
-                    end_station=get_object_or_404(Station,station_code = dest_station)
+                    end_station=get_object_or_404(Station,station_code = dest_station),
+                    journey_date=date_of_journey,
                 )
 
                 booking = Booking.objects.create(
@@ -92,12 +93,8 @@ def create_booking(request):
                     booking_status="Confirmed",
                     booking_date=datetime.now().date(), 
                     total_amt=seat.price,
-                    date_of_journey=date_of_journey,
                     pnr=pnr
                 )
-
-                seat.available_seats -= 1
-                seat.save()
 
                 messages.success(request, "Booking confirmed!")
                 return redirect('home')
@@ -121,9 +118,6 @@ def cancel_ticket(request):
 
             if confirm == 'yes':
                 seat_booking = SeatBooking.objects.get(booking=booking)
-                seat = seat_booking.seat
-                seat.available_seats += 1
-                seat.save()
                 seat_booking.delete()
                 booking.delete()
                 messages.success(request, f"Booking with PNR {pnr} has been successfully canceled.")

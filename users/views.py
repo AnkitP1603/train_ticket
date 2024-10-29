@@ -1,12 +1,12 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib import messages
-from .forms import UserRegisterForm,UserUpdateForm,ProfileUpdateForm,CheckPnrForm
+from .forms import UserRegisterForm,UserUpdateForm,ProfileUpdateForm,CheckPnrForm,TrainIDForm
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from .models import Profile
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
-
+from registration.models import Booking,SeatBooking,Train,Route
 # Create your views here.
 
 def about(request):
@@ -99,7 +99,7 @@ def calendar_view(request):
     return render(request, 'users/calendar.html', context)
 
 
-from registration.models import Booking,SeatBooking
+
 def check_pnr(request):
     if request.method == 'POST':
         form = CheckPnrForm(request.POST)
@@ -125,3 +125,27 @@ def check_pnr(request):
         form = CheckPnrForm()
     
     return render(request, 'users/check_pnr.html', {'form': form})
+
+
+
+def train_route_view(request):
+    train = None
+    route_stops = []
+    form = TrainIDForm()
+
+    if request.method == 'POST':
+        form = TrainIDForm(request.POST)
+        if form.is_valid():
+            train_id = form.cleaned_data['train_id']
+            try:
+                train = Train.objects.get(train_id=train_id)
+                route_stops = Route.objects.filter(train=train).order_by('stop_order')
+            except Train.DoesNotExist:
+                messages.error(request, "Train ID not found. Please enter a valid Train ID.")
+
+    context = {
+        'form': form,
+        'train': train,
+        'route_stops': route_stops,
+    }
+    return render(request, 'train_route.html', context)

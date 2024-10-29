@@ -18,7 +18,6 @@
                 <th>Departure Time</th>
                 <th>Arrival Time</th>
                 <th>Class</th>
-                <th>Available Seats</th>
                 <th>Price</th>
             </tr>
         </thead>
@@ -33,7 +32,6 @@
                     <td>{{ train.departure_time }}</td>
                     <td>{{ train.arrival_time }}</td>
                     <td>{{ seat.carriage.class_name }}</td>
-                    <td>{{ seat.available_seats }}</td>
                     <td>{{ seat.price }}</td>
                 </tr>
                 {% endfor %}
