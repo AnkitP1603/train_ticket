@@ -31,7 +31,6 @@
                 <a class="nav-item nav-link" href="{% url 'home' %}">Home</a>
                 <a class="nav-item nav-link" href="{% url 'about' %}">About</a>
               </div>
-              <!-- Navbar Right Side -->
               <div class="navbar-nav">
                 {% if user.is_authenticated %}
                   <a class="nav-item nav-link" href="{% url 'profile' %}">Profile</a>
@@ -72,13 +71,13 @@
                     <a href="{% url 'check_pnr' %}" class="custom-link">Check PNR</a>
                   </li>
                   <li class="list-group-item list-group-item-light">
-                    <a href="#" class="custom-link">Announcements</a>
+                    <a href="{% url 'check_route' %}" class="custom-link">Check Route</a>
                   </li>
                   <li class="list-group-item list-group-item-light">
                     <a href="{% url 'calendar_page' %}" class="custom-link">View Calendar</a>
                   </li>
                   <li class="list-group-item list-group-item-light">
-                    <a href="#" class="custom-link">Etc</a>
+                    <a href="#" class="custom-link">Announcements</a>
                   </li>
                 </ul>
               </p>

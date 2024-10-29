@@ -25,5 +25,10 @@ class ProfileUpdateForm(forms.ModelForm):
         fields = ['image']
         
 
+
 class CheckPnrForm(forms.Form):
     pnr = forms.CharField(label='PNR Number', max_length=100)
+
+
+class TrainIDForm(forms.Form):
+    train_id = forms.IntegerField(label='Enter Train ID', min_value=1, help_text='Please enter a valid Train ID.')

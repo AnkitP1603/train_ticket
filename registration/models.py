@@ -93,21 +93,27 @@ class Route(models.Model):
         db_table = 'route'
 
     def __str__(self):
-        return f'{self.train_id} at {self.station}'
+        return f'{self.train.train_id} at {self.station}'
 
 
 class Seat(models.Model):
     seat_id = models.AutoField(primary_key=True)
-    journey = models.ForeignKey(Journey, models.CASCADE)
-    carriage = models.ForeignKey('TrainCarriage', models.CASCADE)
+    journey = models.ForeignKey(Journey, on_delete=models.CASCADE)
+    carriage = models.ForeignKey('TrainCarriage', on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    available_seats = models.IntegerField()
 
     class Meta:
         db_table = 'seat'
+        unique_together = ('journey', 'carriage') 
 
     def __str__(self):
         return f'{self.journey} {self.carriage}'
+    
+    def available_seats(self, date):
+        total_capacity = self.carriage.seating_capacity
+        booked_seats = SeatBooking.objects.filter(seat=self, journey=self.journey, seat__carriage=self.carriage, journey_date=date).count()
+        return total_capacity - booked_seats
+
 
 class SeatBooking(models.Model):
     booking_id = models.AutoField(primary_key=True)
@@ -116,6 +122,7 @@ class SeatBooking(models.Model):
     journey = models.ForeignKey(Journey, on_delete=models.CASCADE)
     start_station = models.ForeignKey('Station', on_delete=models.CASCADE)
     end_station = models.ForeignKey('Station', on_delete=models.CASCADE, related_name='seatbooking_end_station_set')
+    journey_date = models.DateField(null=True)
 
     class Meta:
         db_table = 'seat_booking'
@@ -131,7 +138,7 @@ class Booking(models.Model):
     booking_date = models.DateField()
     total_amt = models.DecimalField(max_digits=10, decimal_places=2)
     pnr = models.CharField(unique=True, max_length=15)
-    date_of_journey = models.DateField(null=True)
+    
 
     class Meta:
         db_table = 'booking'
