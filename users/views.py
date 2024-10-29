@@ -148,4 +148,4 @@ def train_route_view(request):
         'train': train,
         'route_stops': route_stops,
     }
-    return render(request, 'train_route.html', context)
+    return render(request, 'users/train_route.html', context)
