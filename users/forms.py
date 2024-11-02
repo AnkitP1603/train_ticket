@@ -31,4 +31,4 @@ class CheckPnrForm(forms.Form):
 
 
 class TrainIDForm(forms.Form):
-    train_id = forms.IntegerField(label='Enter Train ID', min_value=1, help_text='Please enter a valid Train ID.')
+    train_id = forms.IntegerField(label='Enter Train ID', min_value=1)

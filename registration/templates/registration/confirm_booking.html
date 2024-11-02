@@ -1,23 +1,20 @@
-{% extends 'base.html' %}
+{% extends 'users/base.html' %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2>Confirm Booking</h2>
-    <form method="POST" action="{% url 'confirm_booking' %}">
-        {% csrf_token %}
-        <input type="hidden" name="start_station" value="{{ start_station }}">
-        <input type="hidden" name="end_station" value="{{ end_station }}">
-        <input type="hidden" name="date_of_journey" value="{{ date_of_journey }}">
+<h2>Confirm Your Booking</h2>
 
-        <div class="form-group">
-            <label for="train_id">Available Trains:</label>
-            <select name="train_id" class="form-control" required>
-                {% for train in trains %}
-                <option value="{{ train.id }}">{{ train.train_name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary">Confirm Booking</button>
-    </form>
-</div>
+<p>Train: {{ seat.journey.train }}</p>
+<p>From: {{ start_station }} to {{ dest_station }}</p>
+<p>Date of Journey: {{ date_of_journey }}</p>
+<p>Available Seats: {{ available_seats }}</p>
+
+<form method="POST" action="{% url 'create_booking' %}">
+    {% csrf_token %}
+    <input type="hidden" name="selected_seat_id" value="{{ seat.seat_id }}">
+    <input type="hidden" name="date_of_journey" value="{{ date_of_journey }}">
+    <input type="hidden" name="start_station_code" value="{{ start_station.station_code }}">
+    <input type="hidden" name="dest_station_code" value="{{ dest_station.station_code }}">
+    <input type="hidden" name="available_seats" value="{{ available_seats }}">
+    <button type="submit" class="btn btn-primary">Confirm Booking</button>
+</form>
 {% endblock %}

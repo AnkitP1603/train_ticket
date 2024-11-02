@@ -1,7 +1,8 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from decimal import Decimal
 from django.contrib.auth.models import User
-from .models import Passenger
+from .models import Route,Journey,Passenger,Seat,TrainCarriage
 
 @receiver(post_save, sender=User)
 def create_passenger(sender, instance, created, **kwargs):
@@ -12,5 +13,50 @@ def create_passenger(sender, instance, created, **kwargs):
             email=instance.email, 
             age=0  
         )
-        
 
+
+@receiver(post_save, sender=Route)
+def create_journeys_on_route_creation(sender, instance, created, **kwargs):
+    if created:
+        print("Signal triggered: A new Route has been added.")
+        train = instance.train
+        routes = Route.objects.filter(train=train).order_by('stop_order')
+
+        for i in range(len(routes)):
+            for j in range(i + 1, len(routes)):
+                src_station = routes[i].station
+                dest_station = routes[j].station
+                departure_time = routes[i].departure_time
+                arrival_time = routes[j].arrival_time
+
+                journey_exists = Journey.objects.filter(
+                    train=train,
+                    src_station=src_station,
+                    dest_station=dest_station
+                ).exists()
+
+                if not journey_exists:
+                    Journey.objects.create(
+                        train=train,
+                        src_station=src_station,
+                        dest_station=dest_station,
+                        departure_time=departure_time,
+                        arrival_time=arrival_time
+                    )
+
+
+@receiver(post_save, sender=Journey)
+def create_seats_for_new_journey(sender, instance, created, **kwargs):
+    if created:
+        carriages = TrainCarriage.objects.filter(train=instance.train)
+
+        for carriage in carriages:
+            formatted_duration, total_hours = instance.get_duration()
+            dynamic_price = carriage.base_rate * Decimal(total_hours)
+
+            Seat.objects.create(
+                journey=instance,
+                carriage=carriage,
+                price=dynamic_price,
+            )
+            print(f"Seat created for carriage {carriage} with duration {formatted_duration} and price {dynamic_price}")

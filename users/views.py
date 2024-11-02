@@ -120,7 +120,7 @@ def check_pnr(request):
 
                 return render(request, 'users/check_pnr.html',context)
             except Booking.DoesNotExist:
-                messages.error(request, 'No booking found with the provided PNR.')
+                pass
     else:
         form = CheckPnrForm()
     
