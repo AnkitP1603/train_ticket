@@ -10,16 +10,6 @@
             <button type="submit" class="btn btn-primary">View Route</button>
         </form>
 
-        {% if messages %}
-            <div class="mt-3">
-                {% for message in messages %}
-                    <div class="alert alert-danger">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
         {% if train %}
             <h3>Route for Train: {{ train.train_name }} (ID: {{ train.train_id }})</h3>
 

@@ -8,6 +8,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
+from datetime import datetime, timedelta
 
 
 class Passenger(models.Model):
@@ -57,6 +58,7 @@ class TrainCarriage(models.Model):
     train = models.ForeignKey(Train, models.CASCADE)
     class_name = models.CharField(max_length=10)
     seating_capacity = models.IntegerField(null=False)
+    base_rate = models.DecimalField(max_digits=10, decimal_places=2, default=100.00)
 
     class Meta:
         db_table = 'train_carriage'
@@ -80,6 +82,20 @@ class Journey(models.Model):
     def __str__(self):
         return f'{self.src_station} to {self.dest_station} by {self.train_id}'
 
+    def get_duration(self):
+        start = datetime.combine(datetime.min, self.departure_time)
+        end = datetime.combine(datetime.min, self.arrival_time)
+        if end < start:
+            end += timedelta(days=1) 
+
+        duration = end - start
+        total_minutes = duration.total_seconds() // 60
+        hours, minutes = divmod(total_minutes, 60)
+
+        formatted_duration = f"{int(hours)}hrs:{int(minutes)}mins"
+        total_hours = hours + (minutes / 60) 
+        return formatted_duration, total_hours
+
 
 
 class Route(models.Model):
@@ -100,7 +116,7 @@ class Seat(models.Model):
     seat_id = models.AutoField(primary_key=True)
     journey = models.ForeignKey(Journey, on_delete=models.CASCADE)
     carriage = models.ForeignKey('TrainCarriage', on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2) 
 
     class Meta:
         db_table = 'seat'
