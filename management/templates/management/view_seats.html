@@ -1,0 +1,19 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+<h2>Existing Seats</h2>
+<table>
+    <tr>
+        <th>Journey</th>
+        <th>Carriage</th>
+        <th>Price</th>
+    </tr>
+    {% for seat in seats %}
+    <tr>
+        <td>{{ seat.journey }}</td>
+        <td>{{ seat.carriage }}</td>
+        <td>{{ seat.price }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

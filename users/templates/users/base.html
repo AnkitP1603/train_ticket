@@ -1,8 +1,8 @@
 {% load static %}
+{% load group_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -30,6 +30,9 @@
               <div class="navbar-nav mr-auto">
                 <a class="nav-item nav-link" href="{% url 'home' %}">Home</a>
                 <a class="nav-item nav-link" href="{% url 'about' %}">About</a>
+                {% if user.is_authenticated and user|has_group:"Admin" %}
+                    <a class="nav-item nav-link" href="{% url 'admin_dashboard' %}">Admin Dashboard</a>
+                {% endif %}
               </div>
               <div class="navbar-nav">
                 {% if user.is_authenticated %}

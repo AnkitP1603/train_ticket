@@ -1,0 +1,23 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+<h2>Existing Journeys</h2>
+<table>
+    <tr>
+        <th>Train</th>
+        <th>Source Station</th>
+        <th>Destination Station</th>
+        <th>Departure Time</th>
+        <th>Arrival Time</th>
+    </tr>
+    {% for journey in journeys %}
+    <tr>
+        <td>{{ journey.train }}</td>
+        <td>{{ journey.src_station }}</td>
+        <td>{{ journey.dest_station }}</td>
+        <td>{{ journey.departure_time }}</td>
+        <td>{{ journey.arrival_time }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

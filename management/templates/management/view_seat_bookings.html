@@ -1,0 +1,25 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+<h2>Seat Bookings</h2>
+<table>
+    <tr>
+        <th>Passenger</th>
+        <th>Seat</th>
+        <th>Journey</th>
+        <th>Start Station</th>
+        <th>End Station</th>
+        <th>Journey Date</th>
+    </tr>
+    {% for booking in seat_bookings %}
+    <tr>
+        <td>{{ booking.passenger }}</td>
+        <td>{{ booking.seat }}</td>
+        <td>{{ booking.journey }}</td>
+        <td>{{ booking.start_station }}</td>
+        <td>{{ booking.end_station }}</td>
+        <td>{{ booking.journey_date }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

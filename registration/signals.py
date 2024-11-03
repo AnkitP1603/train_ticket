@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save,post_delete
 from django.dispatch import receiver
 from decimal import Decimal
 from django.contrib.auth.models import User
@@ -45,6 +45,7 @@ def create_journeys_on_route_creation(sender, instance, created, **kwargs):
                     )
 
 
+
 @receiver(post_save, sender=Journey)
 def create_seats_for_new_journey(sender, instance, created, **kwargs):
     if created:
@@ -60,3 +61,23 @@ def create_seats_for_new_journey(sender, instance, created, **kwargs):
                 price=dynamic_price,
             )
             print(f"Seat created for carriage {carriage} with duration {formatted_duration} and price {dynamic_price}")
+
+
+@receiver(post_delete, sender=Route)
+def delete_journeys_and_seats_on_route_deletion(sender, instance, **kwargs):
+    print("Signal triggered: A Route has been deleted.")
+    station_to_remove = instance.station
+    train = instance.train
+
+    journeys_to_delete = Journey.objects.filter(train=train).filter(
+        src_station=station_to_remove
+    ) | Journey.objects.filter(train=train).filter(
+        dest_station=station_to_remove
+    )
+
+    for journey in journeys_to_delete:
+        Seat.objects.filter(journey=journey).delete()
+        print(f"Deleted seats for journey from {journey.src_station} to {journey.dest_station}.")
+
+        journey.delete()
+        print(f"Deleted journey from {journey.src_station} to {journey.dest_station}.")

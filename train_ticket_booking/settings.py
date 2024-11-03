@@ -39,9 +39,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
     'registration.apps.RegistrationConfig',
+    'management.apps.ManagementConfig',
     'crispy_forms',
     'crispy_bootstrap4',
+    'guardian',
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend', 
+    'guardian.backends.ObjectPermissionBackend', 
+)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
