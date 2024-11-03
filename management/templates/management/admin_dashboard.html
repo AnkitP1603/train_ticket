@@ -1,0 +1,18 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Administration Dashboard</h2>
+    <nav class="nav flex-column">
+        <a class="nav-link custom-link" href="{% url 'manage_stations' %}">Manage Stations</a>
+        <a class="nav-link custom-link" href="{% url 'manage_routes' %}">Manage Routes</a>
+        <a class="nav-link custom-link" href="{% url 'manage_trains' %}">Manage Trains</a>
+        <a class="nav-link custom-link" href="{% url 'manage_carriages' %}">Manage Carriages</a>
+        <a class="nav-link custom-link" href="{% url 'view_journeys' %}">View Journeys</a>
+        <a class="nav-link custom-link" href="{% url 'view_seats' %}">View Seats</a>
+        <a class="nav-link custom-link" href="{% url 'view_seat_bookings' %}">View Seat Bookings</a>
+        <a class="nav-link custom-link" href="{% url 'view_bookings' %}">View Bookings</a>
+        <a class="nav-link custom-link" href="{% url 'view_passengers' %}">View Passengers</a>
+    </nav>
+</div>
+{% endblock %}

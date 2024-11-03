@@ -30,6 +30,7 @@ urlpatterns = [
     path('calendar/', user_views.calendar_view, name='calendar_page'),
     path('check-pnr/', user_views.check_pnr, name='check_pnr'),
     path('check-route/',user_views.train_route_view, name='check_route'),
+    path('management/',include('management.urls')),
 ]
 
 

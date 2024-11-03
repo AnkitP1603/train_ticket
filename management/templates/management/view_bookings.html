@@ -1,0 +1,23 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+<h2>Bookings</h2>
+<table>
+    <tr>
+        <th>PNR</th>
+        <th>User</th>
+        <th>Status</th>
+        <th>Total Amount</th>
+        <th>Booking Date</th>
+    </tr>
+    {% for booking in bookings %}
+    <tr>
+        <td>{{ booking.pnr }}</td>
+        <td>{{ booking.user }}</td>
+        <td>{{ booking.booking_status }}</td>
+        <td>{{ booking.total_amt }}</td>
+        <td>{{ booking.booking_date }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
