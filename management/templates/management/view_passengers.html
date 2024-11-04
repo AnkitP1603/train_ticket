@@ -6,14 +6,12 @@
     <tr>
         <th>Name</th>
         <th>Email</th>
-        <th>Phone Number</th>
         <th>Age</th>
     </tr>
     {% for passenger in passengers %}
     <tr>
         <td>{{ passenger.passenger_name }}</td>
         <td>{{ passenger.email }}</td>
-        <td>{{ passenger.phone_number }}</td>
         <td>{{ passenger.age }}</td>
     </tr>
     {% endfor %}
