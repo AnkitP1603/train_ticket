@@ -37,12 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'users.apps.UsersConfig',
     'registration.apps.RegistrationConfig',
     'management.apps.ManagementConfig',
     'crispy_forms',
     'crispy_bootstrap4',
-    'guardian',
+    'allauth',
+    'allauth.account'
 ]
 
 AUTHENTICATION_BACKENDS = (
@@ -58,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'train_ticket_booking.urls'
@@ -156,3 +159,11 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
+
+
+SITE_ID = 1  # Ensure this matches your Site in Django admin
+
+# Allauth settings for email verification
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"  # Email verification is mandatory
+ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True

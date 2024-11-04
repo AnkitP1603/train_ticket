@@ -16,8 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
-from users import views as user_views
-from django.contrib.auth import views as auth_views 
+from users import views as user_views 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,6 +30,7 @@ urlpatterns = [
     path('check-pnr/', user_views.check_pnr, name='check_pnr'),
     path('check-route/',user_views.train_route_view, name='check_route'),
     path('management/',include('management.urls')),
+    path('accounts/', include('allauth.urls')),
 ]
 
 
