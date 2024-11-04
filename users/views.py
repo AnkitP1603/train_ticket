@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Profile
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
-from registration.models import Booking,SeatBooking,Train,Route
+from registration.models import Booking,SeatBooking,Train,Route,Passenger
 # Create your views here.
 
 def about(request):
@@ -17,9 +17,20 @@ def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
+            user = form.save()
+            age = form.cleaned_data.get('age')
 
+            profile, created = Profile.objects.get_or_create(user=user)
+            profile.age = age  
+            profile.save()
+
+            Passenger.objects.create(
+                user=user, 
+                passenger_name=user.username, 
+                email=user.email, 
+                age=age
+            )
+            
             messages.success(request,f'Your account has been created! You are now able to log in')
             return redirect('login')
     else:
@@ -40,7 +51,6 @@ def login(request):
             user = form.get_user()
             auth_login(request, user)
             
-            # Ensure profile exists
             if not hasattr(user, 'profile'):
                 Profile.objects.create(user=user)
             
@@ -61,6 +71,13 @@ def profile(request):
         if u_form.is_valid() and p_form.is_valid():
             u_form.save()
             p_form.save()
+
+            passenger = Passenger.objects.get(user=request.user)
+            passenger.passenger_name = u_form.cleaned_data.get('username')
+            passenger.email = u_form.cleaned_data.get('email')
+            passenger.age = p_form.cleaned_data.get('age')
+            passenger.save()
+
             messages.success(request,f'Your account has been updated!')
             return redirect('profile')
 
