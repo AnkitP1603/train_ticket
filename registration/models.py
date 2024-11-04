@@ -15,7 +15,7 @@ class Passenger(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     passenger_id = models.AutoField(primary_key=True)
     passenger_name = models.CharField(max_length=255, verbose_name="Passenger Name")
-    email = models.EmailField(unique=True, max_length=255, help_text="Enter a valid email address.")
+    email = models.EmailField(unique=True,max_length=255, help_text="Enter a valid email address.")
     phone_number = models.CharField(max_length=15, help_text="Enter your phone number.")
     age = models.IntegerField(null=False, validators=[MinValueValidator(0)], help_text="Age must be a non-negative integer.")
 
