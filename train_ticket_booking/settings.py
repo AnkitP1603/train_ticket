@@ -161,9 +161,8 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
 
 
-SITE_ID = 1  # Ensure this matches your Site in Django admin
+SITE_ID = 1  
 
-# Allauth settings for email verification
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"  # Email verification is mandatory
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True

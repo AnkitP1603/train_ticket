@@ -5,11 +5,11 @@ from .models import Profile
 
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField()
-    age = forms.IntegerField(required=False, min_value=0)
+    age = forms.IntegerField(required=True, min_value=0)
 
     class Meta:
         model = User
-        fields = ['username','email','password1','password2']
+        fields = ['username','email','password1','password2','age']
 
     def clean_email(self):
         email = self.cleaned_data.get('email')

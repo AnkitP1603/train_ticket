@@ -138,7 +138,7 @@ class SeatBooking(models.Model):
     journey = models.ForeignKey(Journey, on_delete=models.CASCADE)
     start_station = models.ForeignKey('Station', on_delete=models.CASCADE)
     end_station = models.ForeignKey('Station', on_delete=models.CASCADE, related_name='seatbooking_end_station_set')
-    journey_date = models.DateField(null=True)
+    journey_date = models.DateField(null=False)
 
     class Meta:
         db_table = 'seat_booking'
