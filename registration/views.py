@@ -128,7 +128,6 @@ def create_booking(request):
         date_of_journey = request.POST.get('date_of_journey')
         available_seats = request.POST.get('available_seats')
 
-        print(f"Trying to retrieve seat with ID: {selected_seat_id}")
         seat = get_object_or_404(Seat, seat_id=selected_seat_id)
         start_station = get_object_or_404(Station, station_code=start_station_code)
         dest_station = get_object_or_404(Station, station_code=dest_station_code)
@@ -154,49 +153,66 @@ def create_booking(request):
             stop_order__lt=dest_route.stop_order
         ).order_by('stop_order')
 
-        try:
-            with transaction.atomic():
-                if len(route_segments)>1:
-                    for segment in route_segments:
-                        start = segment.station 
-                        end = Route.objects.get(train=seat.journey.train,stop_order = segment.stop_order+1).station
+        available_seats = seat.carriage.seating_capacity
 
-                        journey_segment = Journey.objects.get(train=seat.journey.train,src_station=start,dest_station=end)
-                        seat_segment = Seat.objects.filter(journey=journey_segment,carriage=seat.carriage).first()
+        for segment in route_segments:
+            start = segment.station
+            end = Route.objects.get(train=seat.journey.train,stop_order = segment.stop_order+1).station
+            journey_segment = Journey.objects.get(train=seat.journey.train,src_station=start,dest_station=end)
+            seat_segment = Seat.objects.filter(journey=journey_segment,carriage=seat.carriage)
 
-                        SeatBooking.objects.create(
-                            passenger=passenger,
-                            seat=seat_segment,
-                            journey=journey_segment,
-                            start_station=start,
-                            end_station=end,
-                            journey_date=date_of_journey,
-                        )
+            curr_available_seats = seat_segment.first().available_seats(date_of_journey)
+            if curr_available_seats <= 0:
+                messages.error(request, "No available seats for the journey! Seat has been booked by someone else.")
+                return redirect('search_train')
+            else:
+                available_seats = min(available_seats,curr_available_seats)
 
-                seat_booking = SeatBooking.objects.create(
-                    passenger=passenger,
-                    seat=seat,
-                    journey=seat.journey,
-                    start_station=start_station,
-                    end_station=dest_station,
-                    journey_date=date_of_journey,
-                )
 
-                Booking.objects.create(
-                    booking=seat_booking,
-                    user=request.user,
-                    booking_status="Confirmed",
-                    booking_date=datetime.now().date(),
-                    total_amt=seat.price,
-                    pnr=pnr
-                )
+        if(available_seats>0):
+            try:
+                with transaction.atomic():
+                    if len(route_segments)>1:
+                        for segment in route_segments:
+                            start = segment.station 
+                            end = Route.objects.get(train=seat.journey.train,stop_order = segment.stop_order+1).station
 
-            messages.success(request, "Booking confirmed!")
-            return redirect('home')
+                            journey_segment = Journey.objects.get(train=seat.journey.train,src_station=start,dest_station=end)
+                            seat_segment = Seat.objects.filter(journey=journey_segment,carriage=seat.carriage).first()
 
-        except Exception as e:
-            messages.error(request, "Booking could not be completed: {}".format(str(e)))
-            return redirect('search_train')
+                            SeatBooking.objects.create(
+                                passenger=passenger,
+                                seat=seat_segment,
+                                journey=journey_segment,
+                                start_station=start,
+                                end_station=end,
+                                journey_date=date_of_journey,
+                            )
+
+                    seat_booking = SeatBooking.objects.create(
+                        passenger=passenger,
+                        seat=seat,
+                        journey=seat.journey,
+                        start_station=start_station,
+                        end_station=dest_station,
+                        journey_date=date_of_journey,
+                    )
+
+                    Booking.objects.create(
+                        booking=seat_booking,
+                        user=request.user,
+                        booking_status="Confirmed",
+                        booking_date=datetime.now().date(),
+                        total_amt=seat.price,
+                        pnr=pnr
+                    )
+
+                messages.success(request, "Booking confirmed!")
+                return redirect('home')
+
+            except Exception as e:
+                messages.error(request, "Booking could not be completed: {}".format(str(e)))
+                return redirect('search_train')
 
     messages.error(request, "Booking could not be completed.")
     return redirect('search_train')
